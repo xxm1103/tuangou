@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 // Channel Types
@@ -9,7 +10,7 @@ export interface Channel {
   status: 'authorized' | 'unauthorized';
   icon: React.ReactNode;
   description: string;
-  businessType: 'group-buying';
+  businessType: 'group-buying' | 'pay-at-table' | 'order-at-table';
   verificationScenarios?: string[];
 }
 

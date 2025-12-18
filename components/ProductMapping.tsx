@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { MOCK_GROUP_BUY_PRODUCTS, POS_ITEMS, MOCK_STORE_BINDINGS, MOCK_PLATFORM_STORES_SOURCE, MOCK_MERCHANT_PRODUCTS, MOCK_COUPON_TEMPLATES, CHANNELS } from '../constants';
 import { BindType, GroupBuyProduct, PosItem, MerchantProduct, CouponTemplate } from '../types';
-import { Check, Edit2, Link, Save, X, Plus, Search, Layers, ListChecks, Ban, UtensilsCrossed, ArrowRight, Trash2, Filter, Store, AlertTriangle, Eye, AlertCircle, Sparkles, Ticket, ScanLine, ArrowRightLeft, CheckCircle2, Upload, FileSpreadsheet, Cloud, User, Clock, ArrowLeftRight, ChevronRight } from 'lucide-react';
+import { Check, Edit2, Link, Save, X, Plus, Search, Layers, ListChecks, Ban, UtensilsCrossed, ArrowRight, Trash2, Filter, Store, AlertTriangle, Eye, AlertCircle, Sparkles, Ticket, ScanLine, ArrowRightLeft, CheckCircle2, Upload, FileSpreadsheet, Cloud, User, Clock, ArrowLeftRight, ChevronRight, RefreshCcw } from 'lucide-react';
 
 export const ProductMapping: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'platform' | 'merchant'>('platform');
@@ -238,7 +238,7 @@ export const ProductMapping: React.FC = () => {
                     <tr key={product.id} className="hover:bg-gray-50/50 transition-colors group">
                         <td className="px-6 py-5">
                             <div className="font-bold text-gray-900">{product.name}</div>
-                            <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center gap-2 mt-2">
                                 {product.source === 'sync' ? (
                                     <span className="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100" title="自动同步">
                                         <Cloud size={10} /> 自动同步
@@ -248,8 +248,12 @@ export const ProductMapping: React.FC = () => {
                                         <User size={10} /> 手动创建
                                     </span>
                                 )}
-                                <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                                    <Clock size={10} /> {product.updateTime}
+                                <span 
+                                    className="text-[10px] text-gray-400 flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 hover:text-gray-600 transition-colors cursor-help"
+                                    title="这是该商品最近一次同步/更新的时间，确保配置是基于最新数据的"
+                                >
+                                    <RefreshCcw size={10} className="animate-spin-slow" />
+                                    最近更新：<span className="font-mono">{product.updateTime}</span>
                                 </span>
                             </div>
                         </td>
@@ -385,7 +389,7 @@ export const ProductMapping: React.FC = () => {
                                 <tr key={product.id} className="hover:bg-gray-50/50 transition-colors group">
                                     <td className="px-6 py-5">
                                         <div className="font-bold text-gray-900">{product.name}</div>
-                                        <div className="flex items-center gap-2 mt-1">
+                                        <div className="flex items-center gap-2 mt-2">
                                             {product.source === 'sync' ? (
                                                 <span className="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100" title="自动同步">
                                                     <Cloud size={10} /> 自动同步
@@ -395,8 +399,12 @@ export const ProductMapping: React.FC = () => {
                                                     <User size={10} /> 手动创建
                                                 </span>
                                             )}
-                                            <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                                                <Clock size={10} /> {product.updateTime}
+                                            <span 
+                                                className="text-[10px] text-gray-400 flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 transition-colors"
+                                                title="这是该商品最近一次同步/更新的时间"
+                                            >
+                                                <RefreshCcw size={10} />
+                                                最近更新：<span className="font-mono">{product.updateTime}</span>
                                             </span>
                                         </div>
                                     </td>

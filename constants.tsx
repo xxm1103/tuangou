@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Channel, PosItem, RedemptionRecord, GroupBuyProduct, BindType, StoreBinding, PlatformStore, ExceptionRecord, CouponTemplate, MerchantProduct } from './types';
 import { 
@@ -7,6 +8,7 @@ import {
 } from 'lucide-react';
 
 export const CHANNELS: Channel[] = [
+  // --- Group Buying (团购业务) ---
   {
     id: '1',
     name: '抖音(企业券)',
@@ -83,6 +85,54 @@ export const CHANNELS: Channel[] = [
     description: '京东生态本地生活服务对接。',
     businessType: 'group-buying',
     verificationScenarios: ['POS收银机核销']
+  },
+
+  // --- Pay at Table (买单业务) ---
+  {
+    id: 'pay-1',
+    name: '抖音一键买单',
+    platformId: 'douyin',
+    category: 'social',
+    status: 'unauthorized',
+    icon: <Video className="w-5 h-5 text-white" />,
+    description: '抖音一键买单对接，实现桌面扫码或POI页面的快速结账功能。',
+    businessType: 'pay-at-table',
+    verificationScenarios: ['POS支付', '自动核销']
+  },
+  {
+    id: 'pay-2',
+    name: '美团一键买单',
+    platformId: 'meituan',
+    category: 'local-life',
+    status: 'unauthorized',
+    icon: <MapPin className="w-5 h-5 text-white" />,
+    description: '美团一键买单服务，连接美团店铺与线下收银，提升买单效率。',
+    businessType: 'pay-at-table',
+    verificationScenarios: ['POS支付', '自动核销']
+  },
+
+  // --- Order at Table (点单业务) ---
+  {
+    id: 'order-1',
+    name: '美团秒提',
+    platformId: 'meituan',
+    category: 'local-life',
+    status: 'unauthorized',
+    icon: <MapPin className="w-5 h-5 text-white" />,
+    description: '美团秒提业务对接，支持用户在美团侧完成即时点单与支付，订单直通POS。',
+    businessType: 'order-at-table',
+    verificationScenarios: ['自动接单', 'POS核销']
+  },
+  {
+    id: 'order-2',
+    name: '抖音快点',
+    platformId: 'douyin',
+    category: 'social',
+    status: 'unauthorized',
+    icon: <Video className="w-5 h-5 text-white" />,
+    description: '抖音快点业务对接，支持短视频/直播间挂载快速下单入口。',
+    businessType: 'order-at-table',
+    verificationScenarios: ['自动接单', 'POS核销']
   }
 ];
 

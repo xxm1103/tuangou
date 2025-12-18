@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { MOCK_STORE_BINDINGS, CHANNELS, MOCK_PLATFORM_STORES_SOURCE } from '../constants';
 import { StoreBinding as StoreBindingType, PlatformStore } from '../types';
@@ -12,7 +13,12 @@ import {
   AlertTriangle,
   X,
   Save,
-  Unlink
+  Unlink,
+  Info,
+  Receipt,
+  MousePointer2,
+  Layout,
+  Store
 } from 'lucide-react';
 
 export const StoreBinding: React.FC = () => {
@@ -35,6 +41,22 @@ export const StoreBinding: React.FC = () => {
 
   const boundCount = filteredBindings.filter(i => i.status === 'bound').length;
   const totalCount = filteredBindings.length;
+
+  // Determine supported businesses for the selected platform
+  const platformBusinesses = useMemo(() => {
+    const channels = CHANNELS.filter(c => c.platformId === selectedPlatform);
+    const types = Array.from(new Set(channels.map(c => c.businessType)));
+    return types.map(type => {
+        switch(type) {
+            case 'group-buying': return { label: '团购核销', icon: Receipt, color: 'text-purple-600 bg-purple-50 border-purple-100' };
+            case 'pay-at-table': return { label: '扫码买单', icon: MousePointer2, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' };
+            case 'order-at-table': return { label: '自助点单', icon: Layout, color: 'text-blue-600 bg-blue-50 border-blue-100' };
+            default: return { label: '其他业务', icon: Store, color: 'text-gray-600 bg-gray-50 border-gray-100' };
+        }
+    });
+  }, [selectedPlatform]);
+
+  const platformName = selectedPlatform === 'douyin' ? '抖音' : selectedPlatform === 'meituan' ? '美团' : '快手';
 
   const handleSelectAll = () => {
     if (selectedItems.length === filteredBindings.length) {
@@ -83,8 +105,10 @@ export const StoreBinding: React.FC = () => {
         </div>
 
         {/* Channel Tabs */}
-        <div className="flex items-center gap-2 mb-8 border-b border-gray-100">
-          {CHANNELS.filter(c => ['douyin', 'meituan', 'kuaishou'].includes(c.platformId)).map(channel => (
+        <div className="flex items-center gap-2 mb-6 border-b border-gray-100">
+          {CHANNELS.filter(c => ['douyin', 'meituan', 'kuaishou'].includes(c.platformId)).reduce((unique, item) => {
+             return unique.some(u => u.platformId === item.platformId) ? unique : [...unique, item];
+          }, [] as typeof CHANNELS).map(channel => (
             <button
               key={channel.id}
               onClick={() => setSelectedPlatform(channel.platformId)}
@@ -95,9 +119,32 @@ export const StoreBinding: React.FC = () => {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-t-lg'}
               `}
             >
-              {channel.name}
+              {channel.platformId === 'douyin' ? '抖音生态' : 
+               channel.platformId === 'meituan' ? '美团点评' : 
+               channel.platformId === 'kuaishou' ? '快手本地' : channel.name}
             </button>
           ))}
+        </div>
+
+        {/* Shared Binding Info Banner */}
+        <div className="mb-8 bg-blue-50/50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+            <Info className="text-blue-500 mt-0.5 flex-shrink-0" size={18} />
+            <div>
+                <h4 className="text-sm font-bold text-blue-900 mb-1">
+                    关于{platformName}门店绑定
+                </h4>
+                <p className="text-xs text-blue-700 leading-relaxed">
+                    {platformName}旗下的所有业务共用一套门店绑定关系。您只需完成一次 POI 关联，即可同时启用以下业务，无需重复操作：
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                    {platformBusinesses.map((bus, idx) => (
+                        <div key={idx} className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold border ${bus.color.replace('bg-', 'bg-white ')}`}>
+                            <bus.icon size={12} />
+                            {bus.label}
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
 
         {/* Toolbar */}
@@ -176,6 +223,7 @@ export const StoreBinding: React.FC = () => {
                 <th className="px-6 py-4">SaaS门店信息</th>
                 <th className="px-6 py-4">绑定状态</th>
                 <th className="px-6 py-4">平台POI信息</th>
+                <th className="px-6 py-4">已开通业务</th>
                 <th className="px-6 py-4 text-right">操作</th>
               </tr>
             </thead>
@@ -220,6 +268,19 @@ export const StoreBinding: React.FC = () => {
                        </div>
                     )}
                   </td>
+                  <td className="px-6 py-4">
+                      {store.status === 'bound' ? (
+                          <div className="flex flex-wrap gap-1.5">
+                              {platformBusinesses.map((bus, idx) => (
+                                  <span key={idx} className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium border ${bus.color}`}>
+                                      {bus.label}
+                                  </span>
+                              ))}
+                          </div>
+                      ) : (
+                          <span className="text-gray-300 text-xs">--</span>
+                      )}
+                  </td>
                   <td className="px-6 py-4 text-right">
                     {store.status === 'bound' ? (
                        <button 
@@ -241,7 +302,7 @@ export const StoreBinding: React.FC = () => {
               ))}
               {filteredBindings.length === 0 && (
                 <tr>
-                   <td colSpan={5} className="py-12 text-center text-gray-400">
+                   <td colSpan={6} className="py-12 text-center text-gray-400">
                       没有找到符合条件的门店
                    </td>
                 </tr>
@@ -253,7 +314,7 @@ export const StoreBinding: React.FC = () => {
 
       {/* Unbind Alert Modal */}
       {storeToUnbind && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
             <div className="p-6">
                <div className="flex items-start gap-4">
@@ -262,9 +323,14 @@ export const StoreBinding: React.FC = () => {
                  </div>
                  <div>
                    <h3 className="text-lg font-bold text-gray-900">确定要解除绑定吗？</h3>
-                   <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                     解除与 <span className="font-bold text-gray-800">{storeToUnbind.saasStoreName}</span> 的关联后，该门店将无法进行团购核销，已售出的券码可能无法正常使用。
-                   </p>
+                   <div className="text-sm text-gray-500 mt-2 leading-relaxed">
+                     <p className="mb-2">解除与 <span className="font-bold text-gray-800">{storeToUnbind.saasStoreName}</span> 的关联后，以下业务将同时<span className="font-bold text-red-600">停止服务</span>：</p>
+                     <ul className="list-disc pl-4 space-y-1 text-xs bg-red-50 p-2 rounded text-red-800">
+                         {platformBusinesses.map((b,i) => (
+                             <li key={i}>{b.label}</li>
+                         ))}
+                     </ul>
+                   </div>
                  </div>
                </div>
             </div>
@@ -316,7 +382,7 @@ const BindModal: React.FC<{
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col h-[600px]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 flex-shrink-0">
